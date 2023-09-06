@@ -2,7 +2,8 @@ package com.example.giphyapp
 
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
-import androidx.recyclerview.widget.LinearLayoutManager
+import android.widget.SearchView.OnQueryTextListener
+import androidx.recyclerview.widget.GridLayoutManager
 import com.example.giphyapp.adapter.GifAdapter
 import com.example.giphyapp.api.MainApi
 import com.example.giphyapp.databinding.ActivityMainBinding
@@ -16,7 +17,12 @@ import retrofit2.converter.gson.GsonConverterFactory
 
 class MainActivity : AppCompatActivity() {
     private lateinit var adapter: GifAdapter
-    lateinit var binding: ActivityMainBinding
+    private lateinit var binding: ActivityMainBinding
+    private val apiKey = "YGHnKKBGSydS6nSt6WAoUcICWwmgCfvL"
+    private val limit = 25
+    private val offset = 0
+    private val rating = "g"
+    private val lang = "en"
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -24,9 +30,8 @@ class MainActivity : AppCompatActivity() {
         setContentView(binding.root)
 
         adapter = GifAdapter()
-        binding.rcView.layoutManager = LinearLayoutManager(this)
+        binding.rcView.layoutManager = GridLayoutManager(this, 3)
         binding.rcView.adapter = adapter
-
 
         val interceptor = HttpLoggingInterceptor()
         interceptor.level = HttpLoggingInterceptor.Level.BODY
@@ -36,19 +41,42 @@ class MainActivity : AppCompatActivity() {
             .build()
 
         val retrofit = Retrofit.Builder()
-            .baseUrl("https://api.giphy.com").client(client)
+            .baseUrl("https://api.giphy.com/v1/").client(client)
             .addConverterFactory(GsonConverterFactory.create())
             .build()
 
         val gifApi = retrofit.create(MainApi::class.java)
 
         CoroutineScope(Dispatchers.IO).launch {
-            val gifsObjectList = gifApi.getGifs()
+            val gifsObjectList = gifApi.getTrendingGifs(apiKey, limit, offset, rating)
             runOnUiThread {
                 binding.apply {
                     adapter.submitList(gifsObjectList.data)
                 }
             }
         }
+
+        binding.SearchView.setOnQueryTextListener(object : OnQueryTextListener {
+            override fun onQueryTextSubmit(text: String?): Boolean {
+                CoroutineScope(Dispatchers.IO).launch {
+                    val gifsObjectList = text?.let {
+                        gifApi.getSearchGifs(apiKey, it, limit, offset, rating, lang)
+                    }
+                    runOnUiThread {
+                        binding.apply {
+                            adapter.submitList(gifsObjectList?.data)
+
+                        }
+                    }
+                }
+                return true
+            }
+
+            override fun onQueryTextChange(p0: String?): Boolean {
+                return true
+            }
+
+        })
+
     }
 }

@@ -2,22 +2,24 @@ package com.example.giphyapp.api
 
 import com.example.giphyapp.dataClasses.Gifs
 import retrofit2.http.GET
+import retrofit2.http.Query
 
 interface MainApi {
-    @GET(
-//        "v1/gifs/search?" +
-//                "api_key=XufPZyjyWSalJeAHofgkvDnCqEpxlCp5&" +
-//                "q=smile+" +
-//                "emoji&" +
-//                "limit=25&" +
-//                "offset=0&" +
-//                "rating=g&" +
-//                "lang=en&"
-    "v1/gifs/trending?" +
-            "api_key=XufPZyjyWSalJeAHofgkvDnCqEpxlCp5&" +
-            "limit=25&" +
-            "offset=0&" +
-            "rating=g"
-    )
-    suspend fun getGifs(): Gifs
+    @GET("gifs/trending")
+    suspend fun getTrendingGifs(
+        @Query("api_key") apiKey: String,
+        @Query("limit") limit: Int,
+        @Query("offset") offset: Int,
+        @Query("rating") rating: String,
+    ): Gifs
+
+    @GET("gifs/search")
+    suspend fun getSearchGifs(
+        @Query("api_key") apiKey: String,
+        @Query("q") query: String,
+        @Query("limit") limit: Int,
+        @Query("offset") offset: Int,
+        @Query("rating") rating: String,
+        @Query("lang") lang: String
+    ): Gifs
 }

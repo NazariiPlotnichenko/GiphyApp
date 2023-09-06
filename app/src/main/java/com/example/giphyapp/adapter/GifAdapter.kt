@@ -21,7 +21,7 @@ class GifAdapter : ListAdapter<Gif, GifAdapter.Holder>(Comparator()) {
     }
     class Comparator: DiffUtil.ItemCallback<Gif>(){
         override fun areItemsTheSame(oldItem: Gif, newItem: Gif): Boolean {
-            return oldItem.id == newItem.id
+            return oldItem.embed_url == newItem.embed_url
         }
 
         override fun areContentsTheSame(oldItem: Gif, newItem: Gif): Boolean {
