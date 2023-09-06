@@ -6,22 +6,26 @@ import android.view.ViewGroup
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
+import com.bumptech.glide.Glide
 import com.example.giphyapp.R
 import com.example.giphyapp.dataClasses.Gif
-import com.example.giphyapp.databinding.ListGifBinding
+import com.example.giphyapp.databinding.GifItemBinding
+
+
 
 class GifAdapter : ListAdapter<Gif, GifAdapter.Holder>(Comparator()) {
 
-    class Holder(view: View) : RecyclerView.ViewHolder(view){
-        private val binding = ListGifBinding.bind(view)
-
-        fun bind(gif: Gif) = with(binding){
-            textView.text = gif.embed_url
+    class Holder(view: View) : RecyclerView.ViewHolder(view) {
+        private val binding = GifItemBinding.bind(view)
+        fun bind(gif: Gif) = with(binding) {
+            //Glide.with(root).load(gif.images.original.url).into(gifImageView)
+            binding.textView.text = gif.images.original.url
         }
     }
-    class Comparator: DiffUtil.ItemCallback<Gif>(){
+
+    class Comparator : DiffUtil.ItemCallback<Gif>() {
         override fun areItemsTheSame(oldItem: Gif, newItem: Gif): Boolean {
-            return oldItem.embed_url == newItem.embed_url
+            return oldItem.images.original.url == newItem.images.original.url
         }
 
         override fun areContentsTheSame(oldItem: Gif, newItem: Gif): Boolean {
@@ -32,7 +36,7 @@ class GifAdapter : ListAdapter<Gif, GifAdapter.Holder>(Comparator()) {
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): Holder {
         val view = LayoutInflater.from(parent.context)
-            .inflate(R.layout.list_gif, parent, false)
+            .inflate(R.layout.gif_item, parent, false)
         return Holder(view)
     }
 

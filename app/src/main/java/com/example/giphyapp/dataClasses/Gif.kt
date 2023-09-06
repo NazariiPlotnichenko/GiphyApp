@@ -7,5 +7,6 @@ data class Gif(
 //    val slug: String,
 //    val bitly_gif_url: String,
 //    val bitly_url: String,
-    val embed_url: String,
+//    val embed_url: String,
+    val images: Images
 )
