@@ -12,15 +12,18 @@ import com.example.giphyapp.dataClasses.Gif
 import com.example.giphyapp.databinding.GifItemBinding
 
 
+class GifAdapter(private val onGifClicked: (Gif) -> Unit) :
+    ListAdapter<Gif, GifAdapter.Holder>(Comparator()) {
 
-class GifAdapter : ListAdapter<Gif, GifAdapter.Holder>(Comparator()) {
-
-    class Holder(view: View) : RecyclerView.ViewHolder(view) {
+    inner class Holder(view: View, val onGifClicked: (Gif) -> Unit) :
+        RecyclerView.ViewHolder(view) {
         private val binding = GifItemBinding.bind(view)
+
         fun bind(gif: Gif) = with(binding) {
-            //Glide.with(root).load(gif.images.original.url).into(gifImageView)
-            binding.textView.text = gif.images.original.url
+            Glide.with(root).load(gif.images.original.url).into(gifImageView)
+            binding.root.setOnClickListener { onGifClicked(gif) }
         }
+
     }
 
     class Comparator : DiffUtil.ItemCallback<Gif>() {
@@ -31,13 +34,12 @@ class GifAdapter : ListAdapter<Gif, GifAdapter.Holder>(Comparator()) {
         override fun areContentsTheSame(oldItem: Gif, newItem: Gif): Boolean {
             return oldItem == newItem
         }
-
     }
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): Holder {
         val view = LayoutInflater.from(parent.context)
             .inflate(R.layout.gif_item, parent, false)
-        return Holder(view)
+        return Holder(view, onGifClicked)
     }
 
     override fun onBindViewHolder(holder: Holder, position: Int) {
