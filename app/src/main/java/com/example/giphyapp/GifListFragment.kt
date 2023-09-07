@@ -11,15 +11,15 @@ import com.example.giphyapp.adapter.GifAdapter
 import com.example.giphyapp.dataClasses.Gif
 import com.example.giphyapp.databinding.GiflistfragmentBinding
 import com.example.giphyapp.domain.GifRepository
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.launch
+import kotlinx.coroutines.*
 import org.koin.core.component.KoinComponent
 import org.koin.core.component.inject
 
 class GifListFragment : Fragment(R.layout.giflistfragment), KoinComponent {
     private lateinit var binding: GiflistfragmentBinding
     private lateinit var adapter: GifAdapter
+    private var jobSearch: Job? = null
+    private var jobTrending: Job? = null
     private val gifRepository: GifRepository by inject()
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -42,7 +42,7 @@ class GifListFragment : Fragment(R.layout.giflistfragment), KoinComponent {
         binding.rcView.layoutManager = GridLayoutManager(requireContext(), 3)
         binding.rcView.adapter = adapter
 
-        CoroutineScope(Dispatchers.IO).launch {
+        jobTrending = CoroutineScope(Dispatchers.IO).launch {
             val gifsObjectList = gifRepository.getTrendingGifs()
             requireActivity().runOnUiThread {
                 binding.apply {
@@ -53,7 +53,8 @@ class GifListFragment : Fragment(R.layout.giflistfragment), KoinComponent {
 
         binding.SearchView.setOnQueryTextListener(object : SearchView.OnQueryTextListener {
             override fun onQueryTextSubmit(text: String?): Boolean {
-                CoroutineScope(Dispatchers.IO).launch {
+                jobSearch?.cancel()
+                jobSearch = CoroutineScope(Dispatchers.IO).launch {
                     val gifsObjectList = text?.let {
                         gifRepository.getSearchGifs(it)
                     }
@@ -71,5 +72,11 @@ class GifListFragment : Fragment(R.layout.giflistfragment), KoinComponent {
             }
 
         })
+    }
+
+    override fun onDestroyView() {
+        jobSearch?.cancel()
+        jobTrending?.cancel()
+        super.onDestroyView()
     }
 }
