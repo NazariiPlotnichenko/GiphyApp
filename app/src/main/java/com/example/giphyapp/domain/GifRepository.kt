@@ -5,7 +5,7 @@ import com.example.giphyapp.dataClasses.Gifs
 
 class GifRepository(val mainApi: MainApi) {
     private val apiKey = "YGHnKKBGSydS6nSt6WAoUcICWwmgCfvL"
-    private val limit = 25
+    private val limit = 50
     private val offset = 0
     private val rating = "g"
     private val lang = "en"
